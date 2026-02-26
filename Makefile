@@ -19,7 +19,7 @@ all: check
 
 check: $(OBJECTS)
 
-# Optional app target once main() and implementations are ready.
+
 app: $(OBJECTS) | $(BIN_DIR)
 	$(CXX) $(OBJECTS) -o $(TARGET) $(LDFLAGS)
 

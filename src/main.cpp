@@ -1,6 +1,6 @@
 #include <iostream>
 
 int main() {
-    std::cout << "Load balancer simulation scaffold ready.\n";
+    std::cout << "\n";
     return 0;
 }
