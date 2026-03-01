@@ -2,6 +2,11 @@
 
 #include <sstream>
 
+/**
+ * @file Request.cpp
+ * @brief Implements Request constructors and formatting.
+ */
+
 Request::Request(
     int requestId,
     const std::string& in,

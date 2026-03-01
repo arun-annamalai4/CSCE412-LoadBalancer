@@ -5,6 +5,11 @@
 #include <sstream>
 #include <stdexcept>
 
+/**
+ * @file Config.cpp
+ * @brief Implements config parsing and validation helpers.
+ */
+
 namespace {
 std::string trim(const std::string& input) {
     std::size_t start = 0;

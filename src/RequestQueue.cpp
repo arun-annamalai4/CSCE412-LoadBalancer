@@ -2,6 +2,11 @@
 
 #include <stdexcept>
 
+/**
+ * @file RequestQueue.cpp
+ * @brief Implements FIFO queue operations for RequestQueue.
+ */
+
 void RequestQueue::enqueue(const Request& request) {
     queue_.push(request);
 }

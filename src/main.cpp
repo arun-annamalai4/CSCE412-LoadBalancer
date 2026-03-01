@@ -6,6 +6,14 @@
 #include "Config.h"
 #include "LoadBalancer.h"
 
+/**
+ * @file main.cpp
+ * @brief Entry point for running the load balancer simulation.
+ */
+
+/**
+ * @brief Loads config, runs simulation, and reports output location.
+ */
 int main(int argc, char* argv[]) {
     std::string configPath = "config/default.cfg";
     if (argc >= 2) {

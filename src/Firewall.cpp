@@ -3,6 +3,11 @@
 #include <sstream>
 #include <stdexcept>
 
+/**
+ * @file Firewall.cpp
+ * @brief Implements IPv4 range parsing and block checks.
+ */
+
 Firewall::Firewall(const std::vector<IpRange>& blockedRanges) {
     for (const IpRange& range : blockedRanges) {
         addBlockedRange(range);

@@ -10,12 +10,24 @@
 #include "RequestQueue.h"
 #include "WebServer.h"
 
+/**
+ * @file LoadBalancer.h
+ * @brief Core simulation orchestrator that manages queue, servers, and scaling.
+ */
+
+/**
+ * @brief Runs the request-processing simulation and server autoscaling policy.
+ */
 class LoadBalancer {
 public:
+    /** @brief Constructs load balancer from config and dependent components. */
     explicit LoadBalancer(const Config& config);
 
+    /** @brief Sets up initial servers and initial queue state. */
     void initialize();
+    /** @brief Runs the simulation for configured number of cycles. */
     void run();
+    /** @brief Executes one simulation cycle. */
     void tick();
 
 private:

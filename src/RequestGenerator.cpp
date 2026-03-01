@@ -2,6 +2,11 @@
 
 #include <stdexcept>
 
+/**
+ * @file RequestGenerator.cpp
+ * @brief Implements random request generation logic.
+ */
+
 RequestGenerator::RequestGenerator(const Config& config)
     : minJobTime_(config.minJobTime),
       maxJobTime_(config.maxJobTime),

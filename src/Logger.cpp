@@ -5,6 +5,11 @@
 #include <sstream>
 #include <stdexcept>
 
+/**
+ * @file Logger.cpp
+ * @brief Implements event logging and summary reporting.
+ */
+
 Logger::Logger(const std::string& filePath) {
     std::filesystem::path p(filePath);
     if (p.has_parent_path()) {

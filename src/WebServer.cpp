@@ -2,6 +2,11 @@
 
 #include <stdexcept>
 
+/**
+ * @file WebServer.cpp
+ * @brief Implements single-server request processing behavior.
+ */
+
 WebServer::WebServer(int id) : id_(id) {}
 
 int WebServer::id() const {

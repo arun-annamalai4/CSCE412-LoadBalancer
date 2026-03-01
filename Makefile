@@ -12,7 +12,7 @@ TARGET := $(BIN_DIR)/load_balancer
 SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
 OBJECTS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SOURCES))
 
-.PHONY: all check app clean
+.PHONY: all check app docs clean
 
 # Default target: compile all translation units.
 all: check
@@ -22,6 +22,9 @@ check: $(OBJECTS)
 
 app: $(OBJECTS) | $(BIN_DIR)
 	$(CXX) $(OBJECTS) -o $(TARGET) $(LDFLAGS)
+
+docs:
+	doxygen Doxyfile
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@

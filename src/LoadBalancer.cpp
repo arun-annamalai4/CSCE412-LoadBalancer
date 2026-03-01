@@ -3,6 +3,11 @@
 #include <algorithm>
 #include <iostream>
 
+/**
+ * @file LoadBalancer.cpp
+ * @brief Implements simulation lifecycle and autoscaling logic.
+ */
+
 LoadBalancer::LoadBalancer(const Config& config)
     : config_(config),
       firewall_(config.blockedRanges),
