@@ -1,0 +1,147 @@
+#include "LoadBalancer.h"
+
+#include <algorithm>
+#include <iostream>
+
+LoadBalancer::LoadBalancer(const Config& config)
+    : config_(config),
+      firewall_(config.blockedRanges),
+      generator_(config),
+      logger_(config.logFile) {}
+
+void LoadBalancer::initialize() {
+    servers_.clear();
+    for (int i = 0; i < config_.initialServers; ++i) {
+        addServer();
+    }
+
+    const int initialQueueSize = config_.initialServers * config_.initialQueueMultiplier;
+    for (int i = 0; i < initialQueueSize; ++i) {
+        Request request = generator_.createRequest(0);
+        logger_.logGenerated(request);
+        if (!firewall_.isBlocked(request.ipIn)) {
+            requestQueue_.enqueue(request);
+            logger_.logArrival(request);
+        } else {
+            logger_.logBlocked(request, "blocked by firewall");
+        }
+    }
+}
+
+void LoadBalancer::run() {
+    initialize();
+
+    for (currentCycle_ = 0; currentCycle_ < config_.totalCycles; ++currentCycle_) {
+        tick();
+    }
+
+    logger_.finalizeSummary(config_.totalCycles);
+}
+
+void LoadBalancer::tick() {
+    logger_.logCycleHeader(currentCycle_, requestQueue_.size(), servers_.size());
+
+    processIncomingRequests();
+    assignRequestsToIdleServers();
+    advanceServers();
+    applyScalingPolicy();
+
+    logger_.logCycleMetrics(currentCycle_, requestQueue_.size(), servers_.size());
+
+    if (cooldownRemaining_ > 0) {
+        --cooldownRemaining_;
+    }
+}
+
+void LoadBalancer::processIncomingRequests() {
+    const int arrivals = generator_.randomArrivalCount();
+    for (int i = 0; i < arrivals; ++i) {
+        Request request = generator_.createRequest(currentCycle_);
+        logger_.logGenerated(request);
+
+        if (firewall_.isBlocked(request.ipIn)) {
+            logger_.logBlocked(request, "blocked by firewall");
+            continue;
+        }
+
+        requestQueue_.enqueue(request);
+        logger_.logArrival(request);
+    }
+}
+
+void LoadBalancer::assignRequestsToIdleServers() {
+    for (std::size_t i = 0; i < servers_.size(); ++i) {
+        if (requestQueue_.empty()) {
+            break;
+        }
+
+        if (!servers_[i]->isBusy()) {
+            Request next = requestQueue_.dequeue();
+            const bool assigned = servers_[i]->assignRequest(next, currentCycle_);
+            if (assigned) {
+                logger_.logAssigned(servers_[i]->id(), next);
+            }
+        }
+    }
+}
+
+void LoadBalancer::advanceServers() {
+    for (std::size_t i = 0; i < servers_.size(); ++i) {
+        servers_[i]->tick(currentCycle_);
+        if (servers_[i]->hasCompletedRequest()) {
+            Request done = servers_[i]->consumeCompletedRequest();
+            logger_.logCompleted(servers_[i]->id(), done);
+        }
+    }
+}
+
+void LoadBalancer::applyScalingPolicy() {
+    if (cooldownRemaining_ > 0) {
+        return;
+    }
+
+    const std::size_t queueSize = requestQueue_.size();
+
+    if (queueSize > highThreshold()) {
+        addServer();
+        logger_.logScaleUp(servers_.size(), queueSize);
+        cooldownRemaining_ = config_.scaleCooldownCycles;
+        return;
+    }
+
+    if (queueSize < lowThreshold()) {
+        const bool removed = removeOneIdleServer();
+        if (removed) {
+            logger_.logScaleDown(servers_.size(), queueSize);
+            cooldownRemaining_ = config_.scaleCooldownCycles;
+        }
+    }
+}
+
+void LoadBalancer::addServer() {
+    const int newId = static_cast<int>(servers_.size()) + 1;
+    servers_.push_back(std::make_unique<WebServer>(newId));
+}
+
+bool LoadBalancer::removeOneIdleServer() {
+    if (servers_.size() <= 1) {
+        return false;
+    }
+
+    for (int i = static_cast<int>(servers_.size()) - 1; i >= 0; --i) {
+        if (!servers_[i]->isBusy()) {
+            servers_.erase(servers_.begin() + i);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+std::size_t LoadBalancer::lowThreshold() const {
+    return 50U * servers_.size();
+}
+
+std::size_t LoadBalancer::highThreshold() const {
+    return 80U * servers_.size();
+}

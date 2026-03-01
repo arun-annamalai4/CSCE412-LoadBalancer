@@ -1,0 +1,20 @@
+# Build artifacts
+build/
+*.o
+*.obj
+*.out
+*.exe
+load_balancer
+
+# Logs
+logs/
+
+# Doxygen generated output
+docs/html/
+docs/latex/
+
+# macOS
+.DS_Store
+
+# Editor (keep workspace settings out of git by default)
+.vscode/

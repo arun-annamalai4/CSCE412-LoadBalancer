@@ -24,6 +24,7 @@ public:
     ~Logger();
 
     void logCycleHeader(int cycle, std::size_t queueSize, std::size_t serverCount);
+    void logGenerated(const Request& request);
     void logArrival(const Request& request);
     void logBlocked(const Request& request, const std::string& reason);
     void logAssigned(int serverId, const Request& request);
