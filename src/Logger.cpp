@@ -110,6 +110,24 @@ void Logger::logCycleMetrics(int cycle, std::size_t queueSize, std::size_t serve
     writeLine(out.str());
 }
 
+void Logger::logRunSetup(std::size_t startingQueueSize, int minTaskTime, int maxTaskTime) {
+    writeLine("\n===== RUN SETUP =====");
+    writeLine("startingQueueSize: " + std::to_string(startingQueueSize));
+    writeLine("taskTimeRange: " + std::to_string(minTaskTime) + "-" + std::to_string(maxTaskTime));
+}
+
+void Logger::logEndStatus(
+    std::size_t endingQueueSize,
+    std::size_t activeServers,
+    std::size_t inactiveServers,
+    std::size_t remainingQueueRequests) {
+    writeLine("\n===== END STATUS =====");
+    writeLine("endingQueueSize: " + std::to_string(endingQueueSize));
+    writeLine("remainingQueueRequests: " + std::to_string(remainingQueueRequests));
+    writeLine("endingActiveServers: " + std::to_string(activeServers));
+    writeLine("endingInactiveServers: " + std::to_string(inactiveServers));
+}
+
 void Logger::finalizeSummary(int totalCycles) {
     double avgQueue = 0.0;
     if (totalCycles > 0) {

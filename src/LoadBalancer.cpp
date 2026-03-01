@@ -31,6 +31,8 @@ void LoadBalancer::initialize() {
             logger_.logBlocked(request, "blocked by firewall");
         }
     }
+
+    logger_.logRunSetup(requestQueue_.size(), config_.minJobTime, config_.maxJobTime);
 }
 
 void LoadBalancer::run() {
@@ -40,6 +42,16 @@ void LoadBalancer::run() {
         tick();
     }
 
+    std::size_t activeServers = 0;
+    for (const auto& server : servers_) {
+        if (server->isBusy()) {
+            ++activeServers;
+        }
+    }
+    const std::size_t inactiveServers = servers_.size() - activeServers;
+    const std::size_t endingQueue = requestQueue_.size();
+
+    logger_.logEndStatus(endingQueue, activeServers, inactiveServers, endingQueue);
     logger_.finalizeSummary(config_.totalCycles);
 }
 

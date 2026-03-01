@@ -63,6 +63,14 @@ public:
     void logScaleDown(std::size_t newServerCount, std::size_t queueSize);
     /** @brief Logs cycle-level metrics. */
     void logCycleMetrics(int cycle, std::size_t queueSize, std::size_t serverCount);
+    /** @brief Logs required rubric setup values. */
+    void logRunSetup(std::size_t startingQueueSize, int minTaskTime, int maxTaskTime);
+    /** @brief Logs required rubric end status values. */
+    void logEndStatus(
+        std::size_t endingQueueSize,
+        std::size_t activeServers,
+        std::size_t inactiveServers,
+        std::size_t remainingQueueRequests);
 
     /** @brief Writes final summary statistics. */
     void finalizeSummary(int totalCycles);
